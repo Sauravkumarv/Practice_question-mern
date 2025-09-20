@@ -19,7 +19,7 @@ return res.status(201).json({success:true,message:"Registered Successfully",newU
 
 const Login=async(req,res)=>{
  try {
-  const {email,password}=req.body;
+  const {email,password,role}=req.body;
 
   const user=await USER.findOne({email})
   if(!user) return res.status(401).json({success:false,message:"User not Found"})
@@ -28,8 +28,8 @@ const Login=async(req,res)=>{
   
   if(!isMatch)return res.status(401).json({ success:false,message: "Invalid Password" });
   
-const accessToken=generateAccessToken(user._id)
-const refreshToken=generateRefreshToken(user._id)
+const accessToken=generateAccessToken(user)
+const refreshToken=generateRefreshToken(user)
 
 res.cookie("refreshToken",refreshToken,{
   httpOnly: true,

@@ -18,4 +18,17 @@ const protect=(req,res,next)=>{
   })
 }
 
-module.exports=protect;
+const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    try {
+      if (!roles.includes(req.user.role)) {
+        return res.status(403).json({ message: "Access Denied" });
+      }
+      next(); // agar role match karta hai to next middleware/route pe jao
+    } catch (error) {
+      return res.status(500).json({ message: "Server Error", error: error.message });
+    }
+  };
+};
+
+module.exports={protect,authorizeRoles}
