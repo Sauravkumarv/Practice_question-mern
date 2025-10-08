@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat App</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .chat-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 600px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 90vh;
+      max-height: 700px;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: white;
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    #messages {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #messages::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #messages::-webkit-scrollbar-thumb {
+      background: #667eea;
+      border-radius: 4px;
+    }
+
+    #messages p {
+      background: white;
+      padding: 14px 18px;
+      border-radius: 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      max-width: 80%;
+      word-wrap: break-word;
+      animation: messageSlide 0.3s ease-out;
+      position: relative;
+      color: #2d3748;
+      line-height: 1.5;
+      border-left: 4px solid #667eea;
+    }
+
+    @keyframes messageSlide {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .input-container {
+      padding: 20px 24px;
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    #message {
+      flex: 1;
+      padding: 14px 20px;
+      border: 2px solid #e2e8f0;
+      border-radius: 24px;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s ease;
+      background: #f8f9fa;
+      color: #2d3748;
+    }
+
+    #message:focus {
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    #message::placeholder {
+      color: #a0aec0;
+    }
+
+    #btn {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 24px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    #btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    #btn:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 600px) {
+      .chat-container {
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      #messages p {
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <h1>💬 Chatting App</h1>
+    </div>
+    
+    <div id="messages"></div>
+    
+    <div class="input-container">
+      <input type="text" placeholder="Type your message..." id="message">
+      <button id="btn">Send</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket=io();
+    const message=document.getElementById('message')
+    const send=document.getElementById('btn')
+    const allMessages=document.getElementById('messages')
+
+    socket.on("message",(msg)=>{
+      const p=document.createElement("p")
+      p.innerText=msg;
+      allMessages.appendChild(p)
+      allMessages.scrollTop = allMessages.scrollHeight;
+    })
+
+    send.addEventListener("click",(e)=>{
+      const msg=message.value
+      console.log(msg)
+      socket.emit('user-message',msg)
+      message.value = '';
+    })
+
+    message.addEventListener("keypress",(e)=>{
+      if(e.key === 'Enter'){
+        send.click();
+      }
+    })
+  </script>
+</body>
+</html>
